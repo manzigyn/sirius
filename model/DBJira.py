@@ -121,7 +121,7 @@ class DBJira:
         return duckdb.sql("""select
                                 c."Custom field (Customer Requester)"  as "Customer Requester",
                                 count(c."Custom field (Customer Requester)") as Quantidade
-                            from main.tickets_custom c
+                            from df c
                             group by c."Custom field (Customer Requester)" 
                             order by c."Custom field (Customer Requester)"    
                             """).df()  
@@ -132,7 +132,7 @@ class DBJira:
                                 left(c."Issue key", position('-' in c."Issue key")-1) "Issue key",	
                                 c."Custom field (Customer Requester)" as "Customer Requester",
                                 count(c."Custom field (Customer Requester)") as Quantidade
-                            from main.tickets_custom c
+                            from df c
                             group by left(c."Issue key", position('-' in c."Issue key")-1),
                             c."Custom field (Customer Requester)" ,
                             order by "Customer Requester",1
@@ -144,7 +144,7 @@ class DBJira:
                                 c.Created[4:6] as mes, 
                                 concat('20',c.Created[8:10]) as ano,
                                 count(*) as Quantidade
-                            from main.tickets_custom c
+                            from df c
                             group by c.Created[4:6], 
                                 concat('20',c.Created[8:10]) 
                             order by ano    
@@ -157,7 +157,7 @@ class DBJira:
                                 c.Created[4:6] as mes, 
                                 concat('20',c.Created[8:10]) as ano,
                                 count(c.*) as Quantidade
-                            from main.tickets_custom c
+                            from df c
                             group by left(c."Issue key", position('-' in c."Issue key")-1),
                                 c.Created[4:6], 
                                 concat('20',c.Created[8:10])
@@ -170,7 +170,7 @@ class DBJira:
                                 c.Created[4:6] as mes, 
                                 concat('20',c.Created[8:10]) as ano,
                                 count(*) as Quantidade
-                            from main.tickets_custom c
+                            from df c
                             group by c.Created[4:6], 
                                 concat('20',c.Created[8:10]) 
                             order by ano    
@@ -183,7 +183,7 @@ class DBJira:
                                 c.Created[4:6] as mes, 
                                 concat('20',c.Created[8:10]) as ano,
                                 count(c.*) as Quantidade
-                            from main.tickets_custom c
+                            from df c
                             group by left(c."Issue key", position('-' in c."Issue key")-1),
                                 c.Created[4:6], 
                                 concat('20',c.Created[8:10])

@@ -11,11 +11,18 @@ select * from main.tickets_all
 
 select * from main.tickets_custom 
 
+-- projetos distintos
+select distinct 
+	left(c."Issue key", position('-' in c."Issue key")-1) as Projeto
+from main.tickets_custom c
+
 -- Todos os chamados em aberto (qtde)
 select * from main.tickets_custom c
 order by c."Issue Type" 
 
-select count(*) from main.tickets_custom  c
+select 
+	count(*) as Quantidade
+from main.tickets_custom  c
 
 select 
     left(c."Issue key", position('-' in c."Issue key")-1) "Issue key",	
@@ -97,6 +104,7 @@ from main.tickets_custom c
 group by left(c."Issue key", position('-' in c."Issue key")-1),
 c."Components" ,
 order by "Components",1
+
 
 -- qtde chamados aberto por custormer requester
 select
