@@ -8,13 +8,24 @@ from dataclasses import dataclass, field
 class CTLJira():
     
     df_tickets : pd.DataFrame = field(default_factory = pd.DataFrame)
+    dbJira : db.DBJira = field(default_factory=db.DBJira)
     
     def __init__(self, arquivo):
         self.df_tickets = self.importarDF(arquivo)
+        self.dbJira = db.DBJira(self.df_tickets)
         
     def importarDF(self, arquivo) ->pd.DataFrame:
         df = pf.lerCsv(arquivo)
         return df
 
     def consultarTodos(self) -> pd.DataFrame:
-        return db.DBJira(self.df_tickets).consultarTodos()
+        return self.dbJira.consultarTodos()
+    
+    def consultarQtdeTodos(self) -> pd.DataFrame:
+        return self.dbJira.obterQtdeTodos()
+    
+    def consultarQtdeIssueType(self) -> pd.DataFrame:
+        return self.dbJira.obterQtdeIssueType()
+    
+    def consultarQtdeIssueType_Projeto(self) -> pd.DataFrame:
+        return self.dbJira.obterQtdeIssueType_Projeto()

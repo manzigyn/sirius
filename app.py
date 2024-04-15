@@ -15,6 +15,9 @@ def main():
                 st.dataframe(ctlJira.df_tickets)
             with tab_todos:
                 st.dataframe(ctlJira.consultarTodos())
+                st.dataframe(ctlJira.consultarQtdeTodos())
+                st.dataframe(ctlJira.consultarQtdeIssueType())
+                st.dataframe(ctlJira.consultarQtdeIssueType_Projeto())
         
         
         
