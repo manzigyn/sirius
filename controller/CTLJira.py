@@ -23,9 +23,9 @@ class CTLJira():
     def tratarDF(self): 
         self.df_tickets["Projeto"] = self.df_tickets["Issue key"].apply(lambda x: ut.extrairAteCaracter(x, "-"))
         self.df_tickets["Created Mes"] = self.df_tickets["Created"].apply(lambda x: ut.extrairAteCaracter(x, "/",1))
-        self.df_tickets["Created Ano"] = self.df_tickets["Created"].apply(lambda x: f"20{ut.extrairAteCaracter(x, "/",2)}"[:4])
+        self.df_tickets["Created Ano"] = self.df_tickets["Created"].apply(lambda x: ut.extrairAno(ut.extrairAteCaracter(x, "/",2)))
         self.df_tickets["Updated Mes"] = self.df_tickets["Updated"].apply(lambda x: ut.extrairAteCaracter(x, "/",1))
-        self.df_tickets["Updated Ano"] = self.df_tickets["Updated"].apply(lambda x: f"20{ut.extrairAteCaracter(x, "/",2)}"[:4])
+        self.df_tickets["Updated Ano"] = self.df_tickets["Updated"].apply(lambda x: ut.extrairAno(ut.extrairAteCaracter(x, "/",2)))
         self.df_tickets["Time to first response"] = self.df_tickets["Custom field (Time to first response)"].apply(lambda x: ut.categorizarColuna(x,"-","✅","❌"))
         self.df_tickets["Time to resolution"] = self.df_tickets["Custom field (Time to resolution)"].apply(lambda x: ut.categorizarColuna(x,"-","✅","❌"))
         self.df_tickets["Internal priority"] = self.df_tickets["Custom field (Internal priority)"].apply(lambda x: " " if math.isnan(x) else x)

@@ -221,6 +221,10 @@ def extrairAteCaracter(valor: str, caracter: str, posicao: int = 0) -> str:
     nova = valor.split(caracter)
     return nova[posicao]
 
+def extrairAno(valor: str, prefixo: str = "20") -> str:
+    saida = prefixo+valor
+    return saida[:4]
+
 def categorizarColuna(valor: str, chave: str, fig_true: str,fig_false) -> str:
     try:
         if  valor.find(chave) >= 0:
