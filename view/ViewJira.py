@@ -1,11 +1,7 @@
 from dataclasses import dataclass, field
 import streamlit as st
-import streamlit_shadcn_ui as ui
 from controller import CTLJira as ctl
 from utils import constantes as co
-from utils import utilidades as ut
-import plotly_express as px    
-import pandas as pd
 
 
 #locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
@@ -24,13 +20,22 @@ class ViewJira():
                 ctlJira.obterListaCamposInicial(),
                 placeholder=co.LST_SELECIONE)
             
-            lstProjetos = ctlJira.obterListaProjetos()
+            optProjetos = st.sidebar.radio("Grupo de projetos", options=["Todos","Brasil","LATAM"])
+            
+            if optProjetos == "Todos":
+                lstProjetos = ctlJira.obterListaProjetos()
+            elif optProjetos == "Brasil":
+                lstProjetos = ctlJira.obterProjetoBrasil()
+            else:
+                lstProjetos = ctlJira.obterProjetoLATAM()    
+            
             cmbProjetos = st.sidebar.multiselect(f"Projetos",
                 lstProjetos,            
                 lstProjetos,
                 placeholder=co.LST_SELECIONE)
-            
+                        
             chkPorcentagem = st.sidebar.checkbox("Mostrar percentual", value=True)
+            
             
             df_filtrado = ctlJira.filtrarProjetos(cmbProjetos) if len(cmbCampos)> 0 else ctlJira.df_tickets
            
@@ -48,15 +53,18 @@ class ViewJira():
                     k=0
                     for i in range(nCol):
                         
-                        if i%wCol == 0:
-                            colunas = st.columns(wCol)                                
-                            k=0                    
-                        coluna = colunas[k%wCol]
-                        k +=1
-                        with coluna:
+                        coluna = st.columns(wCol)                                
+                        with coluna[0]:
                             df = ctlJira.agruparCampo(df_filtrado, [cmbCampos[i]], chkPorcentagem)
-                            coluna.subheader(cmbCampos[i])
-                            coluna.container(height=altura).dataframe(df, hide_index=True, use_container_width=True )
+                            coluna[0].subheader(cmbCampos[i])
+                            coluna[0].container(height=altura).dataframe(df, hide_index=True, use_container_width=True )
+                            
+                        if cmbCampos[i] != "Projeto":
+                            with coluna[1]:
+                                df = ctlJira.agruparCampo(df_filtrado, ["Projeto", cmbCampos[i]], chkPorcentagem)
+                                coluna[1].subheader(f"Projeto -> {cmbCampos[i]}")
+                                coluna[1].container(height=altura).dataframe(df, hide_index=True, use_container_width=True )  
+                                                      
                 with tab_dados:
                     r_da1 = st.columns(1)            
             

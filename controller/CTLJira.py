@@ -82,6 +82,12 @@ class CTLJira():
         df = self.df_tickets[self.df_tickets["Projeto"].isin(filtro)]
         return df
     
+    def obterProjetoBrasil(self) -> list:
+        return ["MERZBRA","KSSTORZBR","SCHUTZBR","TURCKBR"]
+    
+    def obterProjetoLATAM(self) -> list:
+        return ["MERZMXBR","MERZARG","MERZCOL","SCHUTZMX","KLUBERCHEM","SIGMX","OERLIKONMX"]
+
     def consultarTodos(self) -> pd.DataFrame:
         return self.dbJira.consultarTodos()
     
