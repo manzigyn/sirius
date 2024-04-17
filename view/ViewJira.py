@@ -14,6 +14,10 @@ class ViewJira():
         arquivoCarregado = st.sidebar.file_uploader("Carregar arquivo csv", accept_multiple_files=False, type=["csv"])
         delimitador = st.sidebar.text_input(label="Delimitador dos campos",value=",")
         enconder = st.sidebar.selectbox(label="Codificação", options=["utf-8","latin-1"])
+        desconsiderar = st.sidebar.text_input(label="Valores a serem desconsiderados separados por virgula", value="#&~ço$*'\"/\|;:{]requester,Requester-123456,BBB")
+        listaDesconsiderar =[]
+        if len(desconsiderar) > 0:
+            listaDesconsiderar = desconsiderar.split(",")
         if arquivoCarregado:
             
             try:
@@ -49,8 +53,7 @@ class ViewJira():
                     nCol = len(cmbCampos)
                     wCol = 2
                     altura = 380
-                    colunas = st.columns(wCol)           
-                    
+                                        
                     
                     tab_analise, tab_dados = st.tabs([":clipboard: Análise", ":books: Dados"])
                     with tab_analise:
@@ -59,6 +62,9 @@ class ViewJira():
                         for i in range(nCol):
                             
                             coluna = st.columns(wCol)                                
+                            if len(listaDesconsiderar) > 0:
+                                df_filtrado = df_filtrado[~df_filtrado[cmbCampos[i]].isin(listaDesconsiderar)]
+
                             with coluna[0]:
                                 df = ctlJira.agruparCampo(df_filtrado, [cmbCampos[i]], chkPorcentagem)
                                 coluna[0].subheader(cmbCampos[i])
