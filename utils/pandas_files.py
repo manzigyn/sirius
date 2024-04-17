@@ -15,7 +15,7 @@ def lerExcelTipado(lista, tipos) -> pd.DataFrame:
     #df = df.rename(str.lower, axis='columns')
     return df.dropna(how='all', axis=1)
 
-def lerCsv(lista) -> pd.DataFrame:
-    df = pd.read_csv(filepath_or_buffer=lista, delimiter=';', encoding='latin-1')
+def lerCsv(lista, delimitador: str=',', enconder: str = 'utf-8') -> pd.DataFrame:
+    df = pd.read_csv(filepath_or_buffer=lista, delimiter=delimitador, encoding=enconder)
     #df = df.rename(str.lower, axis='columns')
     return df.dropna(how='all', axis=1)

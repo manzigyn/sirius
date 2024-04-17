@@ -11,9 +11,10 @@ class ViewJira():
         
     def criar(self):
         arquivoCarregado = st.sidebar.file_uploader("Carregar arquivo csv", accept_multiple_files=False, type=["csv"])
-        
+        delimitador = st.sidebar.text_input(label="Delimitador dos campos",value=",")
+        enconder = st.sidebar.selectbox(label="Codificação", options=["utf-8","lating-1"])
         if arquivoCarregado:
-            ctlJira = ctl.CTLJira(arquivoCarregado)
+            ctlJira = ctl.CTLJira(arquivoCarregado, delimitador, enconder)
                         
             cmbCampos = st.sidebar.multiselect(f"Campos",
                 ctlJira.obterListaCampos(),            
@@ -37,7 +38,7 @@ class ViewJira():
             chkPorcentagem = st.sidebar.checkbox("Mostrar percentual", value=True)
             
             
-            df_filtrado = ctlJira.filtrarProjetos(cmbProjetos) if len(cmbCampos)> 0 else ctlJira.df_tickets
+            df_filtrado = ctlJira.filtrarProjetos(cmbProjetos) if len(cmbCampos)> 0 else ctlJira._df_tickets
            
                     
             with st.container():
@@ -68,8 +69,8 @@ class ViewJira():
                 with tab_dados:
                     r_da1 = st.columns(1)            
             
-                    r_da1[0].subheader(f"Valores originais. Total de registros: {len(ctlJira.df_tickets.index)}")
-                    r_da1[0].dataframe(ctlJira.df_tickets)
+                    r_da1[0].subheader(f"Valores originais. Total de registros: {len(ctlJira._df_tickets.index)}")
+                    r_da1[0].dataframe(ctlJira._df_tickets)
                 
             
         

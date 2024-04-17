@@ -8,33 +8,35 @@ import math
 @dataclass
 class CTLJira():
     
-    df_tickets : pd.DataFrame = field(default_factory = pd.DataFrame)
-    dbJira : db.DBJira = field(default_factory=db.DBJira)
+    _df_tickets : pd.DataFrame = field(default_factory = pd.DataFrame)
+    _dbJira : db.DBJira = field(default_factory=db.DBJira)
     
-    def __init__(self, arquivo):
-        self.df_tickets = self.importarDF(arquivo)
+    def __init__(self, arquivo, delimitador: str=',', enconder: str = 'utf-8'):
+        self._delimitador = delimitador
+        self._enconder = enconder
+        self._df_tickets = self.importarDF(arquivo)
         self.tratarDF()
-        self.dbJira = db.DBJira(self.df_tickets)
+        self._dbJira = db.DBJira(self._df_tickets)
         
     def importarDF(self, arquivo) ->pd.DataFrame:
-        df = pf.lerCsv(arquivo)
+        df = pf.lerCsv(arquivo, self._delimitador, self._enconder)
         return df
     
     def tratarDF(self): 
-        self.df_tickets["Projeto"] = self.df_tickets["Issue key"].apply(lambda x: ut.extrairAteCaracter(x, "-"))
-        self.df_tickets["Created Mes"] = self.df_tickets["Created"].apply(lambda x: ut.extrairAteCaracter(x, "/",1))
-        self.df_tickets["Created Ano"] = self.df_tickets["Created"].apply(lambda x: ut.extrairAno(ut.extrairAteCaracter(x, "/",2)))
-        self.df_tickets["Updated Mes"] = self.df_tickets["Updated"].apply(lambda x: ut.extrairAteCaracter(x, "/",1))
-        self.df_tickets["Updated Ano"] = self.df_tickets["Updated"].apply(lambda x: ut.extrairAno(ut.extrairAteCaracter(x, "/",2)))
-        self.df_tickets["Time to first response"] = self.df_tickets["Custom field (Time to first response)"].apply(lambda x: ut.categorizarColuna(x,"-","✅","❌"))
-        self.df_tickets["Time to resolution"] = self.df_tickets["Custom field (Time to resolution)"].apply(lambda x: ut.categorizarColuna(x,"-","✅","❌"))
-        self.df_tickets["Internal priority"] = self.df_tickets["Custom field (Internal priority)"].apply(lambda x: " " if math.isnan(x) else x)
+        self._df_tickets["Projeto"] = self._df_tickets["Issue key"].apply(lambda x: ut.extrairAteCaracter(x, "-"))
+        self._df_tickets["Created Mes"] = self._df_tickets["Created"].apply(lambda x: ut.extrairAteCaracter(x, "/",1))
+        self._df_tickets["Created Ano"] = self._df_tickets["Created"].apply(lambda x: ut.extrairAno(ut.extrairAteCaracter(x, "/",2)))
+        self._df_tickets["Updated Mes"] = self._df_tickets["Updated"].apply(lambda x: ut.extrairAteCaracter(x, "/",1))
+        self._df_tickets["Updated Ano"] = self._df_tickets["Updated"].apply(lambda x: ut.extrairAno(ut.extrairAteCaracter(x, "/",2)))
+        self._df_tickets["Time to first response"] = self._df_tickets["Custom field (Time to first response)"].apply(lambda x: ut.categorizarColuna(x,"-","✅","❌"))
+        self._df_tickets["Time to resolution"] = self._df_tickets["Custom field (Time to resolution)"].apply(lambda x: ut.categorizarColuna(x,"-","✅","❌"))
+        self._df_tickets["Internal priority"] = self._df_tickets["Custom field (Internal priority)"].apply(lambda x: " " if math.isnan(x) else x)
 
     def obterListaProjetos(self) -> list:
-        return self.df_tickets["Projeto"].unique()
+        return self._df_tickets["Projeto"].unique()
     
     def obterListaCampos(self) -> list:
-        lista =self.df_tickets.columns.tolist()
+        lista =self._df_tickets.columns.tolist()
         lista.remove("Created Mes")
         lista.remove("Created Ano")
         lista.remove("Updated Mes")
@@ -47,11 +49,9 @@ class CTLJira():
     
     def obterListaCamposInicial(self) -> list:
         lista = self.obterListaCampos()
-        lista.remove("Components_1")
-        lista.remove("Components_2")
-        lista.remove("Issue id")
-        lista.remove("Summary")
-        lista.remove("Assignee Id")
+        remover = ["Components_1","Components.1","Components_2","Components.2", "Issue id", "Summary", "Assignee Id"]
+        lista = list(filter(lambda x: x not in remover, lista))
+        
         return lista
     
     def __agrupar(self, df: pd.DataFrame, coluna: list[str], porcentagem: bool = True) -> pd.DataFrame:
@@ -79,7 +79,7 @@ class CTLJira():
         return self.__agrupar(df, lista, porcentagem)
     
     def filtrarProjetos(self, filtro: list) -> pd.DataFrame:
-        df = self.df_tickets[self.df_tickets["Projeto"].isin(filtro)]
+        df = self._df_tickets[self._df_tickets["Projeto"].isin(filtro)]
         return df
     
     def obterProjetoBrasil(self) -> list:
@@ -89,13 +89,13 @@ class CTLJira():
         return ["MERZMXBR","MERZARG","MERZCOL","SCHUTZMX","KLUBERCHEM","SIGMX","OERLIKONMX"]
 
     def consultarTodos(self) -> pd.DataFrame:
-        return self.dbJira.consultarTodos()
+        return self._dbJira.consultarTodos()
     
     def consultarQtdeTodos(self) -> pd.DataFrame:
-        return self.dbJira.obterQtdeTodos()
+        return self._dbJira.obterQtdeTodos()
     
     def consultarQtdeIssueType(self) -> pd.DataFrame:
-        return self.dbJira.obterQtdeIssueType()
+        return self._dbJira.obterQtdeIssueType()
     
     def consultarQtdeIssueType_Projeto(self) -> pd.DataFrame:
-        return self.dbJira.obterQtdeIssueType_Projeto()
+        return self._dbJira.obterQtdeIssueType_Projeto()
