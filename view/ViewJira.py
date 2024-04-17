@@ -13,7 +13,7 @@ class ViewJira():
         st.sidebar.subheader("V.1.1")
         arquivoCarregado = st.sidebar.file_uploader("Carregar arquivo csv", accept_multiple_files=False, type=["csv"])
         delimitador = st.sidebar.text_input(label="Delimitador dos campos",value=",")
-        enconder = st.sidebar.selectbox(label="Codificação", options=["utf-8","lating-1"])
+        enconder = st.sidebar.selectbox(label="Codificação", options=["utf-8","latin-1"])
         if arquivoCarregado:
             ctlJira = ctl.CTLJira(arquivoCarregado, delimitador, enconder)
                         
