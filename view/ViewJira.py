@@ -108,13 +108,15 @@ class ViewJira():
                             with coluna[0]:
                                 df = ctlOpcao.agruparCampo(df_filtrado, [cmbCampos[i]], chkPorcentagem)
                                 coluna[0].subheader(cmbCampos[i])
-                                coluna[0].container(height=altura).dataframe(df, hide_index=True, use_container_width=True )
+                                altura = int(30 + 35*(len(df)+1)) #int(35.2*(len(df)+1))
+                                coluna[0].container(height=altura).dataframe(df, hide_index=True, use_container_width=True,height=altura )
                                 
                             if  cmbCampos[i] != campoProjeto:
                                 with coluna[idColuna2]:
                                     df = ctlOpcao.agruparCampo(df_filtrado, [campoProjeto, cmbCampos[i]], chkPorcentagem)
                                     coluna[idColuna2].subheader(f"{campoProjeto} -> {cmbCampos[i]}")
-                                    coluna[idColuna2].container(height=altura).dataframe(df, hide_index=True, use_container_width=True )  
+                                    altura = int(25 + 35*(len(df)+1))
+                                    coluna[idColuna2].container(height=altura).dataframe(df, hide_index=True, use_container_width=True, height= altura )  
                                                         
                     with tab_dados:
                         r_da1 = st.columns(1)            
