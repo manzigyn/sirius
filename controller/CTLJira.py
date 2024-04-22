@@ -4,7 +4,7 @@ from model import DBJira as db
 from dataclasses import dataclass, field
 from utils import utilidades as ut
 import math
-from controller import CTLFiltro
+from controller import CTLApoio
 
 @dataclass
 class CTLJira():
@@ -51,18 +51,9 @@ class CTLJira():
     def obterListaCamposInicial(self) -> list:
         lista = self.obterListaCampos()
         remover = ["Components_1","Components.1","Components_2","Components.2", "Issue id", "Summary", "Assignee Id"]
-        lista = list(filter(lambda x: x not in remover, lista))
-        
-        return lista
+        return CTLApoio.removerLista(remover, lista)
     
-    def __agrupar(self, df: pd.DataFrame, coluna: list[str], porcentagem: bool = True) -> pd.DataFrame:
-        registros = len(df.index)
-        df_resultado = df.groupby(coluna).size().reset_index(name='Quantidade')
-        if porcentagem:
-            df_resultado["%"] = (df_resultado["Quantidade"] / registros) *100
-            df_resultado["%"] = df_resultado["%"].apply(lambda x: ut.formatarPorcentagem(x))
-        
-        return df_resultado
+    
     
     def agruparCampo(self, df: pd.DataFrame, campos: list[str], porcentagem: bool = True) -> pd.DataFrame:
         lista = campos
@@ -77,10 +68,10 @@ class CTLJira():
                 campos.remove(valor)
                 
                 
-        return self.__agrupar(df, lista, porcentagem)
+        return CTLApoio.agrupar(df, lista, porcentagem)
     
     def filtrar(self, filtro: list) -> pd.DataFrame:        
-        return CTLFiltro.filtrar(self._df_tickets, campos=["Projeto"], filtro=filtro)
+        return CTLApoio.filtrar(self._df_tickets, campos=["Projeto"], filtro=filtro)
     
     def obterProjetoBrasil(self) -> list:
         return ["MERZBRA","KSSTORZBR","SCHUTZBR","TURCKBR"]

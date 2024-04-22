@@ -35,7 +35,7 @@ class ViewJira():
                     placeholder=co.LST_SELECIONE)
                 
                 if opcao == self.OPT_JIRA:
-                    optProjetos = st.sidebar.radio("Grupo de projetos", options=["Todos","Brasil","LATAM"])
+                    optProjetos = st.radio("Grupo de projetos", options=["Todos","Brasil","LATAM"])
                     if optProjetos == "Todos":
                         lstProjetos = ctlOpcao.obterListaProjetos()
                     elif opcao == self.OPT_JIRA:
@@ -44,18 +44,33 @@ class ViewJira():
                         else:
                             lstProjetos = ctlOpcao.obterProjetoLATAM()    
                 elif opcao == self.OPT_COFFEECUP:
-                    lstProjetos = ctlOpcao.obterListaProjetos()
-                
-                cmbProjetos = st.sidebar.multiselect(f"Projetos",
+                    optProjetos = st.radio("Grupo de projetos", options=["Todos","Internal Management & Presales","Internal Support Management","Product Management", "Todos exceto Internal project"])
+                    lstTasks = ctlOpcao.obterListaTask()                    
+                    if optProjetos == "Todos":
+                        lstProjetos = ctlOpcao.obterListaProjetos()
+                        lstTasksConfiguradas = lstTasks
+                    elif "Presales" in optProjetos:
+                        lstTasksConfiguradas = ctlOpcao.obterListaTaskPresales(lstTasks)
+                        lstProjetos = ctlOpcao.obterProjetoPresales()
+                    elif "Support" in optProjetos:
+                        lstTasksConfiguradas = lstTasks                                                
+                        lstProjetos = ctlOpcao.obterProjetoSupport()
+                    elif "Product" in optProjetos:
+                        lstTasksConfiguradas = ctlOpcao.obterListaTaskProduct(lstTasks)
+                        lstProjetos = ctlOpcao.obterProjetoProduct()
+                    else:                                            
+                        lstTasksConfiguradas = lstTasks                                                
+                        lstProjetos = ctlOpcao.obterProjetoTodosExcetoInteralProject()
+                        
+                cmbProjetos = st.multiselect(f"Projetos",
                     lstProjetos,            
                     lstProjetos,
                     placeholder=co.LST_SELECIONE)
                 
-                if opcao == self.OPT_COFFEECUP:
-                    lstTasks = ctlOpcao.obterListaTask()
-                    cmbTask = st.sidebar.multiselect(f"Task",
+                if opcao == self.OPT_COFFEECUP:                    
+                    cmbTask = st.multiselect(f"Task",
                         lstTasks,            
-                        lstTasks,
+                        lstTasksConfiguradas,
                         placeholder=co.LST_SELECIONE)
                     cmbProjetos = cmbProjetos + cmbTask
 
@@ -68,7 +83,7 @@ class ViewJira():
                         
                 with st.container():
                     nCol = len(cmbCampos)
-                    wCol = 2
+                    wCol = 2 if opcao == self.OPT_JIRA else 1
                     altura = 380
                                         
                     
@@ -102,8 +117,8 @@ class ViewJira():
             except  UnicodeDecodeError as e:
                 st.error(f"Falha no processamento do arquivo. Verifique o delimitador e o enconding apropriado. Mensagem {e}")       
             except LookupError as e:
-                st.error(f"Falha no processamento do arquivo. Verifique o enconding apropriado. Mensagem {e}")       
-            except:
+                st.error(f"Falha no processamento do arquivo. Verifique o enconding apropriado ou o tipo de arquivo. Mensagem {e}")       
+            except Exception as e:
                 st.error(f"Falha no processamento do arquivo. Verifique o delimitador e o enconding apropriado. Mensagem {e}")       
         
     

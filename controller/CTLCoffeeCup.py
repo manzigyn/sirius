@@ -4,7 +4,7 @@ from model import DBJira as db
 from dataclasses import dataclass, field
 from utils import utilidades as ut
 import math
-from controller import CTLFiltro
+from controller import CTLApoio
 
 @dataclass
 class CTLCoffeeCup():
@@ -40,13 +40,19 @@ class CTLCoffeeCup():
         lista.remove("Date Ano")
         return lista
 
+    def obterListaTaskPresales(self, lista: list) -> list:
+        manter = ["Pre-Sales Activities"]
+        return CTLApoio.manterLista(manter, lista)
+    
+    def obterListaTaskProduct(self, lista: list) -> list:
+        manter = ["PROD - TAX ONE"]
+        return CTLApoio.manterLista(manter, lista)
     
     def obterListaCamposInicial(self) -> list:
         lista = self.obterListaCampos()
         manter = ["Project","Staff","Reference ID"]
-        lista = list(filter(lambda x: x in manter, lista))
+        return CTLApoio.manterLista(manter, lista)
         
-        return lista
     
     def __agrupar(self, df: pd.DataFrame, coluna: list[str], porcentagem: bool = True) -> pd.DataFrame:
         registros = len(df.index)
@@ -65,16 +71,24 @@ class CTLCoffeeCup():
                 campos.remove(valor)
         
                 
-        return self.__agrupar(df, lista, porcentagem)
+        return CTLApoio.agrupar(df, lista, porcentagem)
     
     def filtrar(self, filtro: list) -> pd.DataFrame:
-        return CTLFiltro.filtrar(self._df_tickets, campos=["Project","Task"], filtro=filtro)
+        return CTLApoio.filtrar(self._df_tickets, campos=["Project","Task"], filtro=filtro)
     
-    def obterProjetoBrasil(self) -> list:
-        return ["MERZBRA","KSSTORZBR","SCHUTZBR","TURCKBR"]
+    def obterProjetoPresales(self) -> list:
+        return ["Internal Management & Presales"]
     
-    def obterProjetoLATAM(self) -> list:
-        return ["MERZMXBR","MERZARG","MERZCOL","SCHUTZMX","KLUBERCHEM","SIGMX","OERLIKONMX"]
+    def obterProjetoProduct(self) -> list:
+        return ["Product Management"]
+
+    def obterProjetoSupport(self) -> list:
+        return ["Internal Support Management"]
+    
+    def obterProjetoTodosExcetoInteralProject(self) -> list:
+        lista = self.obterListaProjetos()
+        remover = self.obterProjetoPresales() + self.obterProjetoProduct() + self.obterProjetoSupport()
+        return CTLApoio.removerLista(remover, lista)
 
     def consultarTodos(self) -> pd.DataFrame:
         return self._dbJira.consultarTodos()
