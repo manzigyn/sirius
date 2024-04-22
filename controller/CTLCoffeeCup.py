@@ -7,7 +7,7 @@ import math
 from controller import CTLFiltro
 
 @dataclass
-class CTLJira():
+class CTLCoffeeCup():
     
     _df_tickets : pd.DataFrame = field(default_factory = pd.DataFrame)
     _dbJira : db.DBJira = field(default_factory=db.DBJira)
@@ -24,34 +24,27 @@ class CTLJira():
         return df
     
     def tratarDF(self): 
-        self._df_tickets["Projeto"] = self._df_tickets["Issue key"].apply(lambda x: ut.extrairAteCaracter(x, "-"))
-        self._df_tickets["Created Mes"] = self._df_tickets["Created"].apply(lambda x: ut.extrairAteCaracter(x, "/",1))
-        self._df_tickets["Created Ano"] = self._df_tickets["Created"].apply(lambda x: ut.extrairAno(ut.extrairAteCaracter(x, "/",2)))
-        self._df_tickets["Updated Mes"] = self._df_tickets["Updated"].apply(lambda x: ut.extrairAteCaracter(x, "/",1))
-        self._df_tickets["Updated Ano"] = self._df_tickets["Updated"].apply(lambda x: ut.extrairAno(ut.extrairAteCaracter(x, "/",2)))
-        self._df_tickets["Time to first response"] = self._df_tickets["Custom field (Time to first response)"].apply(lambda x: ut.categorizarColuna(x,"-","✅","❌"))
-        self._df_tickets["Time to resolution"] = self._df_tickets["Custom field (Time to resolution)"].apply(lambda x: ut.categorizarColuna(x,"-","✅","❌"))
-        self._df_tickets["Internal priority"] = self._df_tickets["Custom field (Internal priority)"].apply(lambda x: " " if math.isnan(x) else x)
+        #self._df_tickets["Projeto"] = self._df_tickets["Project"].apply(lambda x: ut.extrairAteCaracter(x, "-"))
+        self._df_tickets["Date Ano"] = self._df_tickets["Date"].apply(lambda x: ut.extrairAteCaracter(x, "-",1))
+        self._df_tickets["Date Mes"] = self._df_tickets["Date"].apply(lambda x: ut.extrairAno(ut.extrairAteCaracter(x, "-",2)))
 
     def obterListaProjetos(self) -> list:
-        return self._df_tickets["Projeto"].unique()
+        return self._df_tickets["Project"].unique()
     
+    def obterListaTask(self) -> list:
+        return self._df_tickets["Task"].unique()
+
     def obterListaCampos(self) -> list:
         lista =self._df_tickets.columns.tolist()
-        lista.remove("Created Mes")
-        lista.remove("Created Ano")
-        lista.remove("Updated Mes")
-        lista.remove("Updated Ano")
-        lista.remove("Time to first response")
-        lista.remove("Time to resolution")
-        lista.remove("Internal priority")
+        lista.remove("Date Mes")
+        lista.remove("Date Ano")
         return lista
 
     
     def obterListaCamposInicial(self) -> list:
         lista = self.obterListaCampos()
-        remover = ["Components_1","Components.1","Components_2","Components.2", "Issue id", "Summary", "Assignee Id"]
-        lista = list(filter(lambda x: x not in remover, lista))
+        manter = ["Project","Staff","Reference ID"]
+        lista = list(filter(lambda x: x in manter, lista))
         
         return lista
     
@@ -66,21 +59,16 @@ class CTLJira():
     
     def agruparCampo(self, df: pd.DataFrame, campos: list[str], porcentagem: bool = True) -> pd.DataFrame:
         lista = campos
-        for valor in ["Created","Updated"]:
+        for valor in ["Date"]:
             if valor in campos:
                 campos.extend([f"{valor} Mes", f"{valor} Ano"])
                 campos.remove(valor)
         
-        for valor in ["Custom field (Time to first response)","Custom field (Time to resolution)","Custom field (Internal priority)"]:
-            if valor in campos:
-                campos.extend([ut.extrairStringEntreCaracters(valor,"(",")")])
-                campos.remove(valor)
-                
                 
         return self.__agrupar(df, lista, porcentagem)
     
-    def filtrar(self, filtro: list) -> pd.DataFrame:        
-        return CTLFiltro.filtrar(self._df_tickets, campos=["Projeto"], filtro=filtro)
+    def filtrar(self, filtro: list) -> pd.DataFrame:
+        return CTLFiltro.filtrar(self._df_tickets, campos=["Project","Task"], filtro=filtro)
     
     def obterProjetoBrasil(self) -> list:
         return ["MERZBRA","KSSTORZBR","SCHUTZBR","TURCKBR"]
