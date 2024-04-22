@@ -3,7 +3,7 @@ from utils import utilidades as ut
 
 def filtrar(df: pd.DataFrame, campos: list[str], filtro: list) -> pd.DataFrame:
     for campo in campos:
-        df = df[df[campo].isin(filtro)]
+        df = df[df[campo].apply(lambda x: str(x).lower()).isin(list(map(lambda x: str(x).lower(), filtro)))]
     return df
 
 def removerLista(remover: list, lista: list) -> list:

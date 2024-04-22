@@ -13,7 +13,7 @@ class ViewJira():
     OPT_COFFEECUP = "CoffeeCup"
     
     def criar(self):
-        st.sidebar.subheader("V.1.2",help="Incluído o processamento de CoffeeCup")
+        st.sidebar.subheader("V.1.3",help="Incluído o processamento de CoffeeCup")
         opcao = st.sidebar.radio("Tipo de arquivo", [self.OPT_JIRA, self.OPT_COFFEECUP])
         arquivoCarregado = st.sidebar.file_uploader("Carregar arquivo csv", accept_multiple_files=False, type=["csv"])
         delimitador = st.sidebar.text_input(label="Delimitador dos campos",value=",")
@@ -44,9 +44,12 @@ class ViewJira():
                         else:
                             lstProjetos = ctlOpcao.obterProjetoLATAM()    
                 elif opcao == self.OPT_COFFEECUP:
-                    optProjetos = st.radio("Grupo de projetos", options=["Todos","Internal Management & Presales","Internal Support Management","Product Management", "Todos exceto Internal project"])
+                    optProjetos = st.radio("Grupo de projetos", options=["Padrão","Internal Management & Presales","Internal Support Management","Product Management", "Todos exceto Internal project","Todos"])
                     lstTasks = ctlOpcao.obterListaTask()                    
-                    if optProjetos == "Todos":
+                    if optProjetos == "Padrão":
+                        lstProjetos = ctlOpcao.obterProjetoPadrao()
+                        lstTasksConfiguradas = lstTasks
+                    elif optProjetos == "Todos":
                         lstProjetos = ctlOpcao.obterListaProjetos()
                         lstTasksConfiguradas = lstTasks
                     elif "Presales" in optProjetos:
@@ -82,8 +85,7 @@ class ViewJira():
             
                         
                 with st.container():
-                    nCol = len(cmbCampos)
-                    wCol = 2 if opcao == self.OPT_JIRA else 1
+                    nCol = len(cmbCampos)                    
                     altura = 380
                                         
                     
@@ -94,6 +96,9 @@ class ViewJira():
                         k=0
                         for i in range(nCol):
                             
+                            wCol = 1 if opcao == self.OPT_COFFEECUP and (cmbCampos[i] == "Project" or cmbCampos[i] == "Reference ID")  else 2
+                            idColuna2 = wCol-1
+                            campoProjeto = "Project" if opcao == self.OPT_COFFEECUP else "Projeto"
                             coluna = st.columns(wCol)                                
                             if len(listaDesconsiderar) > 0:
                                 df_filtrado = df_filtrado[~df_filtrado[cmbCampos[i]].isin(listaDesconsiderar)]
@@ -103,11 +108,11 @@ class ViewJira():
                                 coluna[0].subheader(cmbCampos[i])
                                 coluna[0].container(height=altura).dataframe(df, hide_index=True, use_container_width=True )
                                 
-                            if opcao == "Jira" and cmbCampos[i] != "Projeto":
-                                with coluna[1]:
-                                    df = ctlOpcao.agruparCampo(df_filtrado, ["Projeto", cmbCampos[i]], chkPorcentagem)
-                                    coluna[1].subheader(f"Projeto -> {cmbCampos[i]}")
-                                    coluna[1].container(height=altura).dataframe(df, hide_index=True, use_container_width=True )  
+                            if  cmbCampos[i] != campoProjeto:
+                                with coluna[idColuna2]:
+                                    df = ctlOpcao.agruparCampo(df_filtrado, [campoProjeto, cmbCampos[i]], chkPorcentagem)
+                                    coluna[idColuna2].subheader(f"{campoProjeto} -> {cmbCampos[i]}")
+                                    coluna[idColuna2].container(height=altura).dataframe(df, hide_index=True, use_container_width=True )  
                                                         
                     with tab_dados:
                         r_da1 = st.columns(1)            

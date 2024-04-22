@@ -29,7 +29,7 @@ class CTLCoffeeCup():
         self._df_tickets["Date Mes"] = self._df_tickets["Date"].apply(lambda x: ut.extrairAno(ut.extrairAteCaracter(x, "-",2)))
 
     def obterListaProjetos(self) -> list:
-        return self._df_tickets["Project"].unique()
+        return self._df_tickets["Project"].apply(lambda x: str(x).strip()).unique()
     
     def obterListaTask(self) -> list:
         return self._df_tickets["Task"].unique()
@@ -52,16 +52,7 @@ class CTLCoffeeCup():
         lista = self.obterListaCampos()
         manter = ["Project","Staff","Reference ID"]
         return CTLApoio.manterLista(manter, lista)
-        
-    
-    def __agrupar(self, df: pd.DataFrame, coluna: list[str], porcentagem: bool = True) -> pd.DataFrame:
-        registros = len(df.index)
-        df_resultado = df.groupby(coluna).size().reset_index(name='Quantidade')
-        if porcentagem:
-            df_resultado["%"] = (df_resultado["Quantidade"] / registros) *100
-            df_resultado["%"] = df_resultado["%"].apply(lambda x: ut.formatarPorcentagem(x))
-        
-        return df_resultado
+   
     
     def agruparCampo(self, df: pd.DataFrame, campos: list[str], porcentagem: bool = True) -> pd.DataFrame:
         lista = campos
@@ -84,6 +75,9 @@ class CTLCoffeeCup():
 
     def obterProjetoSupport(self) -> list:
         return ["Internal Support Management"]
+
+    def obterProjetoPadrao(self) -> list:
+        return ["Internal Support Management","Schütz - Brazil Ongoing Support","Turck - Brazil Support","Merz - Brazil Support","STORZ Brazil Support","Brazil (BRI) Dunning Process","Brazil (BRI) New Company Code - Merz Hauz","Merz - Argentina Support","Oerlikon Support Mexico","Merz - Colombia Support","Schütz - Mexico Ongoing Support","Merz - Mexico Support","Product Management","Klüber/Chemtrend Mex Support","Sig (BRI) Mexico Support"]
     
     def obterProjetoTodosExcetoInteralProject(self) -> list:
         lista = self.obterListaProjetos()
