@@ -18,8 +18,18 @@ def agrupar(df: pd.DataFrame, coluna: list[str], porcentagem: bool = True) -> pd
         registros = len(df.index)
         df_resultado = df.groupby(coluna).size().reset_index(name='Quantidade')
         df_resultado = df_resultado.sort_values('Quantidade',ascending=False) 
+
+        totalPorcentagem = 0
         if porcentagem:
             df_resultado["%"] = (df_resultado["Quantidade"] / registros) *100
+            totalPorcentagem = ut.formatarPorcentagem(df_resultado["%"].sum())
             df_resultado["%"] = df_resultado["%"].apply(lambda x: ut.formatarPorcentagem(x))
+         
+        if len(coluna) == 1:
+            df_resumo = {coluna[0] :"Total geral","Quantidade" : df_resultado["Quantidade"].sum()} if not porcentagem  else {coluna[0] :"Total geral","Quantidade" : df_resultado["Quantidade"].sum(),"%": totalPorcentagem}
+        else:
+            df_resumo = {coluna[0] :"Total geral", coluna[1]: " ", "Quantidade" : df_resultado["Quantidade"].sum()} if not porcentagem  else {coluna[0] :"Total geral", coluna[1]: " ", "Quantidade" : df_resultado["Quantidade"].sum(),"%": totalPorcentagem}
+        df_resultado.loc[len(df_resultado)] = df_resumo
+
         
         return df_resultado

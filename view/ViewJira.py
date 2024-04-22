@@ -13,7 +13,7 @@ class ViewJira():
     OPT_COFFEECUP = "CoffeeCup"
     
     def criar(self):
-        st.sidebar.subheader("V.1.3",help="Incluído o processamento de CoffeeCup")
+        st.sidebar.subheader("V.1.4",help="Incluído o processamento de CoffeeCup")
         opcao = st.sidebar.radio("Tipo de arquivo", [self.OPT_JIRA, self.OPT_COFFEECUP])
         arquivoCarregado = st.sidebar.file_uploader("Carregar arquivo csv", accept_multiple_files=False, type=["csv"])
         delimitador = st.sidebar.text_input(label="Delimitador dos campos",value=",")
@@ -33,6 +33,8 @@ class ViewJira():
                     ctlOpcao.obterListaCampos(),            
                     ctlOpcao.obterListaCamposInicial(),
                     placeholder=co.LST_SELECIONE)
+                
+                lstProjetos = []
                 
                 if opcao == self.OPT_JIRA:
                     optProjetos = st.radio("Grupo de projetos", options=["Todos","Brasil","LATAM"])
